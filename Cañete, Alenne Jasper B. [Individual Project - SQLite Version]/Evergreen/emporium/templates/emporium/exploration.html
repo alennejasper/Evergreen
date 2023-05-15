@@ -1,0 +1,40 @@
+{% extends "emporium/core.html" %}
+{% load static %}
+
+{% block content %}
+<div class = "row">
+    {% for item in items %}
+        {% if item.item_quantity %}
+            <div class = "col-lg-4 mx-auto">
+                <img class = "outline" src = "{{item.image_url}}">
+                
+                <div class = "item-case vendible">
+                    <h5><strong>{{item.item_name}}</strong></h5>
+                    <hr>
+            
+                    <a class = "btn btn-outline-success" href = "{% url 'emporium' %}">&#x2190;return to homepage</a>
+                    
+                    <h5 style = "display: inline-block; float: right">₱{{item.item_price | floatformat:2}}</h5>
+                </div>
+            </div>
+
+            <div class = "col-lg-8 mx-auto">                
+                <div class = "item-case vendible">
+                    <hr>
+                    <h5><p><strong>enchanting story behind the scenes</strong></p></h5>
+                    <hr>
+            
+                    <div class = "description">{{item.item_description}}</div>
+                    <hr>
+
+                    <h5><p><strong>amount of items in season</strong></p></h5>
+                    <hr>
+
+                    <div class = "attainability">An entire stockpile of {{item.item_quantity}} from {{item.item_name}} may still be obtained upon the emporium.</div>
+                    <hr>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock content %}

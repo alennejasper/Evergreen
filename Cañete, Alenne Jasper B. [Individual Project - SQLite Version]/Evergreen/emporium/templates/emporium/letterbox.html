@@ -1,0 +1,28 @@
+{% block content %}
+Greetings, {{customer}}!
+
+The Evergreen's Emporium Letterbox merely wished for you to obtain the subsequent information with respect to the items you infused upon the basket earlier, {{date | date:"M. d, Y"}}.
+
+Items Added to the Basket:
+{% spaceless %}
+{% for order in orders %} 
+{{order.item.item_name}} x {{order.purchase_amount}} 
+{% endfor %}
+{% endspaceless %}
+
+Total:
+₱{{total | floatformat:2}}
+
+By that means, the emporium administrator already verified your purchase today.
+
+A courier meant for the delivery of plants will transfer the items you purchased herein!
+
+Thereupon, please anticipate and expect the plants you wished to obtain for another entire three days, {{delivery | date:"M. d, Y"}}.
+
+Thanks a million, and have a splendid day ahead!
+
+Cordially yours,
+Evergreen
+
+P.S. {{customer}}, kindly convey your sincere concerns or feedbacks, if there is any, on the electronic mail, evergreen.postcard@gmail.com. 
+{% endblock content %}

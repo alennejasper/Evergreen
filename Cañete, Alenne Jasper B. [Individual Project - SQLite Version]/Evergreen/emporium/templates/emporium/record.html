@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+
+{% block content %}
+<html>
+<head>
+    <meta charset = "utf-8">
+
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1, maximum-scale = 1, minimum-scale = 1" />
+            
+    <link rel = "stylesheet" href = "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity = "sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin = "anonymous">
+      
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/core.css' %}">
+</head>
+
+<style>
+    @page{
+	size: a4 portrait;
+}
+</style>
+
+<body style = "font-family: 'Courier New'">
+    <h1 style = "text-align: center"><strong>Evergreen</strong></h1>
+    <p style = "text-align: center; font-style: italic">A mysterious emporium with induction of a beautiful dream in reality.</p>
+
+    <br>
+    <hr>
+    <h5 style = "text-align: center"><p><strong>Deliveries Record</strong></p></h5>
+    <hr>
+
+    <br>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th style = "text-align: center"><h6><strong>Customer</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Shipment</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Date</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Voucher</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Purok</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Barangay</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Municipality</strong></h6></th>
+            </tr>
+        </thead>
+    </table>
+    
+    <hr>
+    <table>
+        <tbody>
+        {% for delivery in deliveries %}
+            <tr>
+                <td style = "text-align: center">{{delivery.persona.user_name}}</td>
+
+                <td style = "text-align: center">{{delivery.purchase.order_status}}</td>
+
+                <td style = "text-align: center">{{delivery.delivery_date}}</td>
+
+                <td style = "text-align: center">{{delivery.purchase.order_voucher | floatformat:0}}</td>
+
+                <td style = "text-align: center">{{delivery.purok_name}}</td>
+
+                <td style = "text-align: center">{{delivery.barangay_name}}</td>
+
+                <td style = "text-align: center">{{delivery.municipality_name}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    
+    <br>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th style = "text-align: center"><h6><strong>Delivery Amount</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Success Total</strong></h6></th>
+
+                <th style = "text-align: center"><h6><strong>Failure Total</strong></h6></th>
+            </tr>
+        </thead>
+    </table>
+
+    <hr>
+    <table>
+        <tbody>
+            <tr>
+                <td style = "text-align: center">{{overall}}</td>
+
+                <td style = "text-align: center">{{success}}</td>
+                
+                <td style = "text-align: center">{{failure}}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+{% endblock content %}

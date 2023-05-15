@@ -1,0 +1,119 @@
+{% extends "emporium/heart.html" %}
+{% load static %}
+
+{% block content %}
+<div class = "container h-100">
+    <div class = "col-lg-12 mx-auto">
+        <div class = "item-case">
+            <a class = "btn btn-outline-dark" href = "{% url 'admin:emporium_item_changelist' %}">update item information</a>
+
+            <hr>
+            <h5><p><strong>overall orders</strong></p></h5>
+
+            <table class = "table">
+                <tr>
+                    <th style = "vertical-align: middle"><h6><strong>customers amount:</strong> {{customer}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>orders amount:</strong> {{orders}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>total:</strong> ₱{{overall | floatformat:2}}</h6></th>
+
+                    <th style = "vertical-align: middle"><a style = "float: right" class = "btn btn-success" href = "{% url 'altogether' %}">generate copy</a></th>
+                </tr>
+            </table>
+        </div>
+        
+        <br>   
+        <div class = "item-case">
+            <hr> 
+            <div class = "basket-row">
+                <div style = "flex: 4"></div>
+
+                <div style = "flex: 2"><strong>item</strong></div>
+
+                <div style = "flex: 2"><strong>price</strong></div>
+
+                <div style = "flex: 2"><strong>amount</strong></div>
+
+                <div style = "flex: 2"><strong>total</strong></div>
+
+                <div style = "flex: 2"><strong>date</strong></div>
+            </div>
+            <hr>
+
+            {% for order in purchases %}
+            <div class = "basket-row">
+                <div style = "flex: 4"><img class = "row-image" src = "{{order.item.image_url}}"></div>
+
+                <div style = "flex: 2">{{order.item.item_name}}</div>
+                
+                <div style = "flex: 2">₱{{order.item.item_price | floatformat:2}}</div>
+
+                <div style = "flex: 2">
+                    <p class = "amount">{{order.purchase_amount}}</p>
+                </div>
+
+                <div style = "flex: 2">₱{{order.total | floatformat:2}}</div>
+
+                <div style = "flex: 2">{{order.purchase_date}}</div>
+            </div>
+            {% endfor %}
+            
+            <hr>
+        </div>
+
+        <br>
+        <div class = "item-case">
+            <hr>
+            <h5><p><strong>orders graph representation</strong></p></h5>
+
+            <hr>
+            <canvas id = "graph"></canvas>
+
+            <hr>
+        </div>
+    </div>
+</div>
+
+<script>
+    Chart.defaults.font.family = "Merriweather"
+    Chart.defaults.font.size = 16
+    Chart.defaults.color = "#FFFFFF"
+    Chart.defaults.borderColor = "#FFFFFF"
+
+    const ctx = document.getElementById("graph");
+
+    new Chart(ctx, {
+        type: "bar",
+
+        data: {
+            labels: {{tag|safe}},
+
+            datasets: [{
+                label: "orders amount",
+
+                data: {{information|safe}},
+
+                fillColor: "#FFFFFF",
+
+                backgroundColor: "seagreen",
+
+                borderColor: "#FFFFFF",
+                
+                borderWidth: 2
+
+            }]
+        },
+
+        options: {
+            scales: {
+
+                y: {
+                    beginAtZero: true
+
+                }
+            }
+        }
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,123 @@
+{% extends "emporium/heart.html" %}
+{% load static %}
+
+{% block content %}
+<div class = "row">
+	<div class = "col-lg-12 mx-auto">
+		<div class = "item-case">
+            <a class = "btn btn-outline-dark" href = "{% url 'overall' %}">&#x2190;return to homepage</a>
+
+            <a style = "float: right" class = "btn btn-success" href = "{% url 'admin:emporium_delivery_changelist' %}">update delivery status</a>
+
+            <hr>
+            <p><strong>overall deliveries</details></strong></p>
+
+            <table class = "table">
+                <tr>
+                    <th style = "vertical-align: middle"><h6><strong>delivery amount:</strong> {{overall}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>success total:</strong> {{success}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>failure total:</strong> {{failure}}</h6></th>
+
+                    <th style = "vertical-align: middle"><a style = "float: right" class = "btn btn-success" href = "{% url 'whole' %}">generate copy</a></th>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <div class = "item-case">
+            <hr> 
+            <div class = "basket-row">
+                <div style = "flex: 2"><strong>customer</strong></div>
+
+                <div style = "flex: 2"><strong>shipment</strong></div>
+
+                <div style = "flex: 2"><strong>date</strong></div>
+
+                <div style = "flex: 2"><strong>voucher</strong></div>
+                
+                <div style = "flex: 2"><strong>purok</strong></div>
+
+                <div style = "flex: 2"><strong>barangay</strong></div>
+
+                <div style = "flex: 2"><strong>municipality</strong></div>
+            </div>
+            <hr>
+
+            {% for delivery in deliveries %}
+            <div class = "basket-row">
+                <div style = "flex: 2">{{delivery.persona.user_name}}</div>
+
+                <div style = "flex: 2">{{delivery.purchase.order_status}}</div>
+
+                <div style = "flex: 2">{{delivery.delivery_date}}</div>
+
+                <div style = "flex: 2">{{delivery.purchase.order_voucher | floatformat:0}}</div>
+
+                <div style = "flex: 2">{{delivery.purok_name}}</div>
+
+                <div style = "flex: 2">{{delivery.barangay_name}}</div>
+
+                <div style = "flex: 2">{{delivery.municipality_name}}</div>
+            </div>
+            {% endfor %}
+
+            <hr>
+		</div>
+
+        <br>
+        <div class = "item-case">
+            <hr>
+            <h5><p><strong>deliveries graph representation</strong></p></h5>
+
+            <hr>
+            <canvas id = "graph"></canvas>
+
+            <hr>
+        </div>
+    </div>
+</div>
+
+<script>
+    Chart.defaults.font.family = "Merriweather"
+    Chart.defaults.font.size = 16
+    Chart.defaults.color = "#FFFFFF"
+    Chart.defaults.borderColor = "#FFFFFF"
+
+    const ctx = document.getElementById("graph");
+
+    new Chart(ctx, {
+        type: "bar",
+
+        data: {
+            labels: {{tag|safe}},
+
+            datasets: [{
+                label: "delivery amount",
+
+                data: {{information|safe}},
+
+                fillColor: "#FFFFFF",
+
+                backgroundColor: "seagreen",
+
+                borderColor: "#FFFFFF",
+                
+                borderWidth: 2
+
+            }]
+        },
+
+        options: {
+            scales: {
+
+                y: {
+                    beginAtZero: true
+
+                }
+            }
+        }
+    });
+</script>
+{% endblock content %}

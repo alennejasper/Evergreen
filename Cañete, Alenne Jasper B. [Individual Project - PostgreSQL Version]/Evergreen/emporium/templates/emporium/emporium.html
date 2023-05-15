@@ -1,0 +1,26 @@
+{% extends "emporium/core.html" %}
+{% load static %}
+
+{% block content %}
+<div class = "row">
+    {% for item in items %}
+        {% if item.item_quantity %}
+            <div class = "col-lg-4 mx-auto">
+                <img class = "outline" src = "{{item.image_url}}">
+                
+                <div class = "item-case vendible">
+                    <h5><strong>{{item.item_name}}</strong></h5>
+
+                    <hr>
+            
+                    <button id = "infuse-button" data-item = "{{item.id}}" data-action = "append" class = "btn btn-outline-secondary add-btn update-basket">add to basket</button>
+                    
+                    <a class = "btn btn-outline-success" href = "{% url 'exploration' item.id %}">explore</a>
+                    
+                    <h5 style = "display: inline-block; float: right">₱{{item.item_price | floatformat:2}}</h5>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock content %}

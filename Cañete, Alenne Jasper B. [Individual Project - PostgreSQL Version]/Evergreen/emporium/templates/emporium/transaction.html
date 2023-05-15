@@ -1,0 +1,73 @@
+{% extends "emporium/core.html" %}
+{% load static %}
+
+{% block content %}
+<div class = "row">
+	<div class = "col-lg-12 mx-auto">
+		<div class = "item-case">
+            <a class = "btn btn-outline-dark" href = "{% url 'emporium' %}">&#x2190;return to homepage</a>
+
+            <hr>
+            <p><strong>orders status</details></strong></p>
+            <hr>
+
+            <table class = "table">
+                <tr>
+                    <th style = "vertical-align: middle"><h6><strong>proceesed orders:</strong> {{processed}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>failed orders:</strong> {{failed}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>shipped orders:</strong> {{shipped}}</h6></th>
+
+                    <th style = "vertical-align: middle"><h6><strong>delivered orders:</strong> {{delivered}}</h6></th>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <div class = "item-case">
+            <hr> 
+            <div class = "basket-row">
+                <div style = "flex: 4"></div>
+                <div style = "flex: 2"><strong>item</strong></div>
+
+                <div style = "flex: 2"><strong>price</strong></div>
+
+                <div style = "flex: 2"><strong>amount</strong></div>
+
+                <div style = "flex: 2"><strong>voucher</strong></div>
+
+                <div style = "flex: 2"><strong>status</strong></div>
+
+                <div style = "flex: 2"><strong>date</strong></div>
+            </div>
+            <hr>
+
+            {% for order in purchases %}
+            <div class = "basket-row">
+                <div style = "flex: 4"><img class = "row-image" src = "{{order.item.image_url}}"></div>
+
+                <div style = "flex: 2">{{order.item.item_name}}</div>
+
+                <div style = "flex: 2">₱{{order.item.item_price | floatformat:2}}</div>
+
+                <div style = "flex: 2">x{{order.purchase_amount}}</div>
+
+                <div style = "flex: 2">{{order.purchase.order_voucher | floatformat:0}}</div>
+
+                <div style = "flex: 2">{{order.purchase.order_status}}</div>
+
+                <div style = "flex: 2">{{order.purchase_date}}</div>
+            </div>
+            {% endfor %}
+
+            <hr>
+            <h6><strong>amount:</strong> {{orders}}</h6>
+            <br>
+            
+            <h6><strong>total:</strong> ₱{{overall | floatformat:2}}</h6>
+            <hr>
+		</div>
+	</div>
+</div>
+{% endblock content %}

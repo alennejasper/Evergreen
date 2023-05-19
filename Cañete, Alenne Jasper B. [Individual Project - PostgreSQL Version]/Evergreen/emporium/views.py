@@ -23,23 +23,23 @@ def access(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        persona = authenticate(request, username = username, password = password)
+        account = authenticate(request, username = username, password = password)
 
-        if persona is not None:
-            if persona.is_superuser == True:
-                login(request, persona)
+        if account is not None:
+            if account.is_superuser == True:
+                login(request, account)
                 return redirect("admin:index")
 
-            elif persona.is_customer == True:
-                login(request, persona)
+            elif account.is_customer == True:
+                login(request, account)
                 return redirect("emporium")
             
-            elif persona.is_analyst == True:
-                login(request, persona)
+            elif account.is_analyst == True:
+                login(request, account)
                 return redirect("overall")
 
         else:
-            messages.info(request, "Either the personal name or the password is imprecise.")
+            messages.info(request, "Either the username or the password is imprecise.")
 
     context = {}
     return render(request, "emporium/access.html", context)
@@ -55,9 +55,9 @@ def register(request):
         form = registration(request.POST)
 
         if form.is_valid():
-            persona = form.save()
+            account = form.save()
             username = form.cleaned_data.get("username")
-            Persona.objects.create(user = persona, user_name = persona.username, first_name = persona.first_name, last_name = persona.last_name, electronic_mail = persona.email)
+            Account.objects.create(user = account, user_name = account.username, first_name = account.first_name, last_name = account.last_name, electronic_mail = account.email)
             messages.success(request, "A personal record was generated for " + username + " today.")
             return redirect("access")  
         
@@ -139,14 +139,14 @@ def purchase(request):
 def transaction(request):
     information = guidance(request)
     basket_items = information["basket_items"]
-    persona = request.user.persona
-    processed = Order.objects.filter(purchase__persona = persona, purchase__order_status = "Processed").aggregate(amount = Count("purchase__order_status")) ["amount"]
-    shipped = Order.objects.filter(purchase__persona = persona, purchase__order_status = "Shipped").aggregate(amount = Count("purchase__order_status")) ["amount"]
-    delivered = Order.objects.filter(purchase__persona = persona, purchase__order_status = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"]
-    failed = Order.objects.filter(purchase__persona = persona, purchase__order_status = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"]
-    orders = Order.objects.filter(purchase__persona = persona).aggregate(amount = Sum("purchase_amount")) ["amount"]
-    overall = Order.objects.filter(purchase__persona = persona).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"]
-    purchases = Order.objects.filter(purchase__persona = persona)
+    account = request.user.account
+    processed = Order.objects.filter(purchase__account = account, purchase__order_status = "Processed").aggregate(amount = Count("purchase__order_status")) ["amount"]
+    shipped = Order.objects.filter(purchase__account = account, purchase__order_status = "Shipped").aggregate(amount = Count("purchase__order_status")) ["amount"]
+    delivered = Order.objects.filter(purchase__account = account, purchase__order_status = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"]
+    failed = Order.objects.filter(purchase__account = account, purchase__order_status = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"]
+    orders = Order.objects.filter(purchase__account = account).aggregate(amount = Sum("purchase_amount")) ["amount"]
+    overall = Order.objects.filter(purchase__account = account).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"]
+    purchases = Order.objects.filter(purchase__account = account)
 
     context = {"basket_items" :basket_items, "processed" :processed, "shipped" :shipped, "delivered" :delivered, "failed" :failed, "orders" :orders, "overall" :overall, "purchases" :purchases}
     return render(request, "emporium/transaction.html", context)
@@ -159,9 +159,9 @@ def rendition(request):
     print("item_action:", item_action)
     print("item_id:", item_id)
 
-    persona = request.user.persona
+    account = request.user.account
     item = Item.objects.get(id = item_id)
-    purchase, created = Purchase.objects.get_or_create(persona = persona, order_completion = False)    
+    purchase, created = Purchase.objects.get_or_create(account = account, order_completion = False)    
     order, created = Order.objects.get_or_create(purchase = purchase, item = item)
 
     if item_action == "append":
@@ -185,12 +185,12 @@ def mechanism(request):
     information = json.loads(request.body)
 
     if request.user.is_authenticated:
-        persona = request.user.persona
-        purchase, created = Purchase.objects.get_or_create(persona = persona, order_completion = False)  
+        account = request.user.account
+        purchase, created = Purchase.objects.get_or_create(account = account, order_completion = False)  
         order = Order.objects.filter(purchase = purchase)
 
     else:
-        persona, purchase = anonymous(request, information)
+        account, purchase = anonymous(request, information)
 
     total = float(information["formation"] ["total"])
     purchase.order_voucher = order_voucher
@@ -201,7 +201,7 @@ def mechanism(request):
 
     if purchase.delivery == True:
         Delivery.objects.create(
-            persona = persona,
+            account = account,
             purchase = purchase,
             phone_number = information["delivery"] ["phone_number"],
             purok_name = information["delivery"] ["purok_name"],
@@ -212,7 +212,7 @@ def mechanism(request):
         template_path = "emporium/letterbox.html"
 
         context = {
-            "customer": request.user.persona.user_name,
+            "customer": request.user.account.user_name,
             "date": datetime.datetime.now(),
             "orders": order,
             "total": purchase.basket_total,
@@ -226,7 +226,7 @@ def mechanism(request):
             "Evergreen's Emporium Letterbox conveyed to you a vital message!",
             body,
             "Evergreen's Emporium Postcard <settings.EMAIL_HOST_USER>",
-            [request.user.persona.electronic_mail],
+            [request.user.account.electronic_mail],
         )
 
         email.fail_silently = False
@@ -294,8 +294,8 @@ def cookies(request):
 
 def guidance(request):
     if request.user.is_authenticated:
-        persona = request.user.persona
-        purchase, created = Purchase.objects.get_or_create(persona = persona, order_completion = False)
+        account = request.user.account
+        purchase, created = Purchase.objects.get_or_create(account = account, order_completion = False)
         items = purchase.order_set.all()
         basket_items = purchase.basket_amount
 
@@ -319,17 +319,17 @@ def anonymous(request, information):
     cookie_information = cookies(request)
     items = cookie_information["items"]
 
-    persona, created = Persona.objects.get_or_create(
+    account, created = Account.objects.get_or_create(
         electronic_mail = electronic_mail,
 
         )
-    persona.user_name = user_name
-    persona.first_name = first_name
-    persona.last_name = last_name
-    persona.save()
+    account.user_name = user_name
+    account.first_name = first_name
+    account.last_name = last_name
+    account.save()
 
     purchase = Purchase.objects.create(
-        persona = persona,
+        account = account,
         order_completion = False,
         )
 
@@ -348,7 +348,7 @@ def anonymous(request, information):
             purchase_amount = figure["purchase_amount"],
             )
             
-    return persona, purchase
+    return account, purchase
 
 @login_required(login_url = "access")
 def overall(request):
@@ -365,7 +365,7 @@ def overall(request):
         "purchases": Report.objects.filter(purchase__order_completion = True).order_by("-purchase_date"),
         "orders": Report.objects.filter(purchase__order_completion = True).aggregate(amount = Sum("purchase_amount")) ["amount"],
         "overall": Report.objects.filter(purchase__order_completion = True).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"],
-        "customer": Transaction.objects.filter(persona__user__is_customer = True).aggregate(amount = Count("persona__user__is_customer", distinct = True)) ["amount"],
+        "customer": Transaction.objects.filter(account__user__is_customer = True).aggregate(amount = Count("account__user__is_customer", distinct = True)) ["amount"],
         "tag": tag,
         "information": information,
     }
@@ -378,7 +378,7 @@ def altogether(request):
         "purchases": Report.objects.filter(purchase__order_completion = True).order_by("-purchase_date"),        
         "orders": Report.objects.filter(purchase__order_completion = True).aggregate(amount = Sum("purchase_amount")) ["amount"],
         "overall": Report.objects.filter(purchase__order_completion = True).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"],
-        "customer": Transaction.objects.filter(persona__user__is_customer = True).aggregate(amount = Count("persona__user__is_customer", distinct = True)) ["amount"],
+        "customer": Transaction.objects.filter(account__user__is_customer = True).aggregate(amount = Count("account__user__is_customer", distinct = True)) ["amount"],
     }
     
     response = HttpResponse(content_type = "application/pdf")
@@ -418,7 +418,7 @@ def monetary(request):
         "purchases": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True),
         "orders": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Sum("purchase_amount")) ["amount"],
         "overall": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"],
-        "customer": Transaction.objects.filter(order_date__range = [origin, epilogue], persona__user__is_customer = True).aggregate(amount = Count("persona__user__is_customer", distinct = True)) ["amount"], 
+        "customer": Transaction.objects.filter(order_date__range = [origin, epilogue], account__user__is_customer = True).aggregate(amount = Count("account__user__is_customer", distinct = True)) ["amount"], 
         "tag": tag,
         "information": information,  
     }
@@ -435,7 +435,7 @@ def fragment(request):
         "purchases": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True),
         "orders": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Sum("purchase_amount")) ["amount"],
         "overall": Report.objects.filter(purchase_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Sum(F("item__item_price") * F("purchase_amount"))) ["amount"],
-        "customer": Transaction.objects.filter(order_date__range = [origin, epilogue], persona__user__is_customer = True).aggregate(amount = Count("persona__user__is_customer", distinct = True)) ["amount"],
+        "customer": Transaction.objects.filter(order_date__range = [origin, epilogue], account__user__is_customer = True).aggregate(amount = Count("account__user__is_customer", distinct = True)) ["amount"],
     }
     
     response = HttpResponse(content_type = "application/pdf")
@@ -516,11 +516,11 @@ def trade(request):
     tag = []
     information = []
 
-    dispatches = Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).distinct("persona__user_name").order_by("persona__user_name")
-    overall = Delivery.objects.filter(delivery_date__range = [origin, epilogue], persona__user__is_customer = True)
+    dispatches = Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).distinct("account__user_name").order_by("account__user_name")
+    overall = Delivery.objects.filter(delivery_date__range = [origin, epilogue], account__user__is_customer = True)
 
     for item in dispatches:
-        tag.append(item.persona.user_name)    
+        tag.append(item.account.user_name)    
     
     for item in overall:
         information.append(item.overall)

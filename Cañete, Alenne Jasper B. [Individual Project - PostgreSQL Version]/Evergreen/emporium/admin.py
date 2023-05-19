@@ -8,7 +8,7 @@ admin.site.index_title = "Emporium Network Authority"
 from .models import *
 
 admin.site.register(User)
-admin.site.register(Persona)
+admin.site.register(Account)
 admin.site.register(Item)
 admin.site.register(Purchase)
 admin.site.register(Order)

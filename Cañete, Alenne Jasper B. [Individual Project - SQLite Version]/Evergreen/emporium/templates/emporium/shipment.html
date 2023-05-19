@@ -14,7 +14,7 @@
 
             <table class = "table">
                 <tr>
-                    <th style = "vertical-align: middle"><h6><strong>deliveries amount:</strong> {{overall}}</h6></th>
+                    <th style = "vertical-align: middle"><h6><strong>delivery amount:</strong> {{overall}}</h6></th>
 
                     <th style = "vertical-align: middle"><h6><strong>success total:</strong> {{success}}</h6></th>
 
@@ -47,7 +47,7 @@
 
             {% for delivery in deliveries %}
             <div class = "basket-row">
-                <div style = "flex: 2">{{delivery.persona.user_name}}</div>
+                <div style = "flex: 2">{{delivery.account.user_name}}</div>
 
                 <div style = "flex: 2">{{delivery.purchase.order_status}}</div>
 

@@ -17,7 +17,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.username + " // permissions assigned to user throughout the repository!"
 
-class Persona(models.Model):
+class Account(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, null = True, blank = True, verbose_name = "User")
     user_name = models.CharField(max_length = 125, null = True, blank = True, verbose_name = "User Name")
     first_name = models.CharField(max_length = 65, null = True, blank = True, verbose_name = "First Name")
@@ -25,8 +25,8 @@ class Persona(models.Model):
     electronic_mail = models.CharField(max_length = 65, null = True, verbose_name = "Electronic Mail")
 
     class Meta:
-        verbose_name = "Persona"
-        verbose_name_plural = "Personas"
+        verbose_name = "Account"
+        verbose_name_plural = "Accounts"
         indexes = [models.Index(fields = ["user_name",])]
 
     def __str__(self):
@@ -59,7 +59,7 @@ class Item(models.Model):
 
 class Purchase(models.Model):
     status = (("Processed", "Processed"), ("Shipped", "Shipped"), ("Delivered", "Delivered"), ("Failed", "Failed"))
-    persona = models.ForeignKey(Persona, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Persona")
+    account = models.ForeignKey(Account, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Account")
     order_date = models.DateTimeField(default = datetime.datetime.now(), verbose_name = "Order Date")
     order_completion = models.BooleanField(default = True, null = True, blank = True, verbose_name = "Order Completion")
     order_voucher = models.CharField(default = datetime.datetime.now().timestamp(), max_length = 20, null = True, verbose_name = "Order Voucher")
@@ -71,10 +71,10 @@ class Purchase(models.Model):
 
     def __str__(self):
         if self.order_completion == True:
-            return str(self.id) + " // " + " fulfilled queued status upon the repository from " + str(self.persona.user_name) + "!"
+            return str(self.id) + " // " + " fulfilled queued status upon the repository from " + str(self.account.user_name) + "!"
         
         else:
-            return str(self.id) + " // " + " neglected queued status upon the repository from " + str(self.persona.user_name) + "!"
+            return str(self.id) + " // " + " neglected queued status upon the repository from " + str(self.account.user_name) + "!"
         
     @property
     def delivery(self):
@@ -109,7 +109,7 @@ class Order(models.Model):
         verbose_name_plural = "Orders"
 
     def __str__(self):
-        return str(self.purchase_amount) + " // amount of item chosen by " + str(self.purchase.persona.user_name) + "!"
+        return str(self.purchase_amount) + " // amount of item chosen by " + str(self.purchase.account.user_name) + "!"
 
     @property
     def total(self):
@@ -122,7 +122,7 @@ class Order(models.Model):
         return overall
 
 class Delivery(models.Model):
-    persona = models.ForeignKey(Persona, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Persona")
+    account = models.ForeignKey(Account, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Account")
     purchase = models.ForeignKey(Purchase, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Purchase")
     phone_number = models.CharField(max_length = 11, null = True, verbose_name = "Phone Number")
     purok_name = models.CharField(max_length = 50, null = True, verbose_name = "Purok Name")
@@ -136,7 +136,7 @@ class Delivery(models.Model):
         indexes = [models.Index(fields = ["phone_number",])]
 
     def __str__(self):
-        return self.municipality_name + " // area of delivery chosen by " + str(self.persona.user_name) + "!"
+        return self.municipality_name + " // area of delivery chosen by " + str(self.account.user_name) + "!"
     
     @property
     def overall(self):
@@ -145,7 +145,7 @@ class Delivery(models.Model):
         return overall
 
 class Transaction(models.Model):
-    persona = models.ForeignKey(Persona, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Persona")
+    account = models.ForeignKey(Account, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Account")
     order_date = models.DateTimeField(default = datetime.datetime.now(), verbose_name = "Order Date")
     order_completion = models.BooleanField(default = True, null = True, blank = True, verbose_name = "Order Completion")
     order_voucher = models.CharField(default = datetime.datetime.now().timestamp(), max_length = 20, null = True, verbose_name = "Order Voucher")
@@ -159,10 +159,10 @@ class Transaction(models.Model):
 
     def __str__(self):
         if self.order_completion == True:
-            return str(self.id) + " // " + " fulfilled status upon the repository from " + str(self.persona.user_name) + "!"
+            return str(self.id) + " // " + " fulfilled status upon the repository from " + str(self.account.user_name) + "!"
         
         else:
-            return str(self.id) + " // " + " neglected status upon the repository from " + str(self.persona.user_name) + "!"
+            return str(self.id) + " // " + " neglected status upon the repository from " + str(self.account.user_name) + "!"
 
 class Report(models.Model):
     item = models.ForeignKey(Item, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Item")
@@ -177,7 +177,7 @@ class Report(models.Model):
         db_table = "emporium_order_view"
 
     def __str__(self):
-        return str(self.purchase_amount) + " // reported amount of item chosen by " + str(self.purchase.persona.user_name) + "!"
+        return str(self.purchase_amount) + " // reported amount of item chosen by " + str(self.purchase.account.user_name) + "!"
     
     @property
     def total(self):

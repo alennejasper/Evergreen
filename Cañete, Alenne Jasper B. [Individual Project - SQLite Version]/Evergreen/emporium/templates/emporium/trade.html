@@ -58,21 +58,21 @@
             </div>
             <hr>
 
-            {% for delivery in deliveries %}
+            {% for shipment in deliveries %}
             <div class = "basket-row">
-                <div style = "flex: 2">{{delivery.account.user_name}}</div>
+                <div style = "flex: 2">{{shipment.account.user_name}}</div>
 
-                <div style = "flex: 2">{{delivery.purchase.order_status}}</div>
+                <div style = "flex: 2">{{shipment.purchase.order_status}}</div>
 
-                <div style = "flex: 2">{{delivery.delivery_date}}</div>
+                <div style = "flex: 2">{{shipment.delivery_date}}</div>
 
-                <div style = "flex: 2">{{delivery.purchase.order_voucher | floatformat:0}}</div>
+                <div style = "flex: 2">{{shipment.purchase.order_voucher | floatformat:0}}</div>
 
-                <div style = "flex: 2">{{delivery.purok_name}}</div>
+                <div style = "flex: 2">{{shipment.purok_name}}</div>
 
-                <div style = "flex: 2">{{delivery.barangay_name}}</div>
+                <div style = "flex: 2">{{shipment.barangay_name}}</div>
 
-                <div style = "flex: 2">{{delivery.municipality_name}}</div>
+                <div style = "flex: 2">{{shipment.municipality_name}}</div>
             </div>
             {% endfor %}
             

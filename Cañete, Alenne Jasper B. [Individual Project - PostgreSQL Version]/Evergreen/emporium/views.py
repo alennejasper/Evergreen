@@ -459,8 +459,8 @@ def shipment(request):
     tag = []
     information = []
 
-    dispatches = Delivery.objects.filter(purchase__order_completion = True).distinct("municipality_name").order_by("municipality_name")
-    overall = Delivery.objects.filter(purchase__order_completion = True)
+    dispatches = Shipment.objects.filter(purchase__order_completion = True).distinct("municipality_name").order_by("municipality_name")
+    overall = Shipment.objects.filter(purchase__order_completion = True)
 
     for item in dispatches:
         tag.append(item.municipality_name)   
@@ -469,10 +469,10 @@ def shipment(request):
         information.append(item.overall)
 
     context = {
-        "deliveries": Delivery.objects.filter(purchase__order_completion = True),
-        "overall": Delivery.objects.filter(purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
-        "success": Delivery.objects.filter(purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
-        "failure": Delivery.objects.filter(purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "deliveries": Shipment.objects.filter(purchase__order_completion = True),
+        "overall": Shipment.objects.filter(purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
+        "success": Shipment.objects.filter(purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "failure": Shipment.objects.filter(purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
         "tag": tag,
         "information": information,
     }
@@ -483,10 +483,10 @@ def whole(request):
     template_path = "emporium/record.html"
     
     context = {
-        "deliveries": Delivery.objects.filter(purchase__order_completion = True),
-        "overall": Delivery.objects.filter(purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
-        "success": Delivery.objects.filter(purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
-        "failure": Delivery.objects.filter(purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "deliveries": Shipment.objects.filter(purchase__order_completion = True),
+        "overall": Shipment.objects.filter(purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
+        "success": Shipment.objects.filter(purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "failure": Shipment.objects.filter(purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
     }
     
     response = HttpResponse(content_type = "application/pdf")
@@ -516,8 +516,8 @@ def trade(request):
     tag = []
     information = []
 
-    dispatches = Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).distinct("account__user_name").order_by("account__user_name")
-    overall = Delivery.objects.filter(delivery_date__range = [origin, epilogue], account__user__is_customer = True)
+    dispatches = Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).distinct("account__user_name").order_by("account__user_name")
+    overall = Shipment.objects.filter(delivery_date__range = [origin, epilogue], account__user__is_customer = True)
 
     for item in dispatches:
         tag.append(item.account.user_name)    
@@ -526,10 +526,10 @@ def trade(request):
         information.append(item.overall)
 
     context = {
-        "deliveries": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True),
-        "overall": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
-        "success": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
-        "failure": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "deliveries": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True),
+        "overall": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
+        "success": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "failure": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
         "tag": tag,
         "information": information,
     }
@@ -543,10 +543,10 @@ def particle(request):
     epilogue = request.session.get("epilogue")
 
     context = {
-        "deliveries": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True),
-        "overall": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
-        "success": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
-        "failure": Delivery.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "deliveries": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True),
+        "overall": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_completion = True).aggregate(amount = Count("purchase__order_completion")) ["amount"],
+        "success": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Delivered").aggregate(amount = Count("purchase__order_status")) ["amount"],
+        "failure": Shipment.objects.filter(delivery_date__range = [origin, epilogue], purchase__order_status__icontains = "Failed").aggregate(amount = Count("purchase__order_status")) ["amount"],
     }
     
     response = HttpResponse(content_type = "application/pdf")

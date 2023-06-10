@@ -36,7 +36,7 @@ class Item(models.Model):
     item_name = models.CharField(max_length = 125, null = True, verbose_name = "Item Name")
     item_description = models.TextField (max_length = 1500, null = True, blank = True, verbose_name = "Item Description")
     item_price = models.DecimalField(max_digits = 5, decimal_places = 2, verbose_name = "Item Price")
-    item_quantity = models.IntegerField(default = 0, null = True, blank = True, verbose_name = "Item Amount")
+    item_quantity = models.IntegerField(default = 0, null = True, blank = True, verbose_name = "Item Quantity")
     item_image = models.ImageField(null = True, blank = True, verbose_name = "Item Image")
     item_catalogue = models.CharField(max_length = 125, null = True, blank = True, verbose_name = "Item Catalogue")
 
@@ -183,3 +183,27 @@ class Report(models.Model):
     def total(self):
         total = self.item.item_price * self.purchase_amount
         return total
+
+class Shipment(models.Model):
+    account = models.ForeignKey(Account, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Account")
+    purchase = models.ForeignKey(Purchase, on_delete = models.SET_NULL, blank = True, null = True, verbose_name = "Purchase")
+    phone_number = models.CharField(max_length = 11, null = True, verbose_name = "Phone Number")
+    purok_name = models.CharField(max_length = 50, null = True, verbose_name = "Purok Name")
+    barangay_name = models.CharField(max_length = 50, null = True, verbose_name = "Barangay Name")
+    municipality_name = models.CharField(max_length = 50, null = True, verbose_name = "Municipality Name")
+    delivery_date = models.DateField(default = datetime.datetime.now() + datetime.timedelta(days = 3), verbose_name = "Delivery Date")
+
+    class Meta:
+        verbose_name = "Delivery"
+        verbose_name_plural = "Deliveries"
+        managed = False
+        db_table = "emporium_delivery_view"
+
+    def __str__(self):
+        return self.municipality_name + " // area of delivery chosen by " + str(self.account.user_name) + "!"
+    
+    @property
+    def overall(self):
+        census = Shipment.objects.filter(purchase__order_completion = True).aggregate(amount = models.Count("municipality_name", distinct = True)) ["amount"]
+        overall = Shipment.objects.filter(purchase__order_completion = True).aggregate(amount = models.Sum(census)) ["amount"]
+        return overall
